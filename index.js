@@ -1,5 +1,5 @@
 const http = require("http");
-const url = require("url");
+const fs = require("fs");
 
 const PORT = 3000;
 
@@ -11,16 +11,24 @@ const server = http.createServer((req, res) => {
 
     switch (path) {
       case "/":
-        return res.end("Home");
+        return writeFile("./index.html", res).then(() => res.end());
       case "/about":
-        return res.end("About");
+        return writeFile("./about.html", res).then(() => res.end());
       case "/contact-me":
-        return res.end("Contact");
+        return writeFile("./contact-me.html", res).then(() => res.end());
       default:
-        return res.end("404");
+        return writeFile("./404.html", res).then(() => res.end());
     }
   }
   res.end("Method not available");
 });
+
+const writeFile = (filePath, res) => {
+  res.writeHead(200, { "Content-Type": "text/html" });
+  return fs.promises.readFile(filePath).then((data) => {
+    //   process.stdout.write(data);
+    res.write(data);
+  });
+};
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
